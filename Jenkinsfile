@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git url: ''
+                git url: 'https://github.com/NITHISH132390/jenkins-Selenium.git'
             }
         }
 
