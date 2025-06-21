@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3'
-        jdk 'JDK 21'
+        jdk 'JDK 21'           // Must match your configured name in Jenkins
+        maven 'Maven 3'        // Must match your configured Maven tool name
     }
 
     environment {
@@ -14,26 +14,38 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/NITHISH132390/jenkins-Selenium.git'
+                echo 'Cloning Git repository...'
+                // You can hardcode Git clone here if you want
+                sh '''
+                    rm -rf selenium-maven
+                    git clone https://github.com/NITHISH132390/jenkins-Selenium.git selenium-maven
+                '''
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build Project') {
             steps {
-                sh 'mvn clean install'
+                dir('selenium-maven') {
+                    sh 'mvn clean compile'
+                }
             }
         }
 
         stage('Run Selenium Tests') {
             steps {
-                sh 'mvn test'
+                dir('selenium-maven') {
+                    sh 'mvn test'
+                }
             }
         }
     }
 
     post {
         always {
-            junit 'target/surefire-reports/*.xml'
+            echo 'Archiving test results...'
+            dir('selenium-maven') {
+                junit 'target/surefire-reports/*.xml'
+            }
         }
     }
 }
